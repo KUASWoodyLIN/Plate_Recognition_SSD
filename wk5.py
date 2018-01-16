@@ -234,7 +234,7 @@ for i in range(10000):
   y_pred_decoded = decode_y2(y_pred, confidence_thresh=0.4, iou_threshold=0.4, top_k='all',
                              input_coords='centroids', normalize_coords=False, img_height=None, img_width=None)
   if len(y_pred_decoded[0]) == 0: label = 'unknown'; print(label);
-  else:box = y_pred_decoded[0][0]; label = '{}: {:.2f}'.format(int(box[0]), box[1])
+  else:box = y_pred_decoded[0][0]; label = '{}: {:.2f}'.format(ids[int(box[0])], box[1])
   label = label.split(':')[0]
   print(label)
   test_ouput._set_value(i, 'Number', label)
