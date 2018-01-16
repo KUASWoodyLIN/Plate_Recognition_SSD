@@ -79,22 +79,23 @@ from Plate_Recognition_SSD.keras_layer_L2Normalization import L2Normalization
 from Plate_Recognition_SSD.ssd_box_encode_decode_utils import SSDBoxEncoder, decode_y, decode_y2
 from Plate_Recognition_SSD.ssd_batch_generator import BatchGenerator
 
-img_height = 240
-img_width = 320
-img_channels = 3
-n_classes = len(ids)
-min_scale = 0.08
-max_scale = 0.96
-scales = [0.08, 0.16, 0.32, 0.64, 0.96]
-aspect_ratios = [0.5, 1.0, 2.0]
-two_boxes_for_ar1 = True
-limit_boxes = False
-variances = [1.0, 1.0, 1.0, 1.0]
-coords = 'centroids'
-normalize_coords = False
+# 1. Set the model configuration parameters
+img_height = 240  # Height of the input images
+img_width = 320   # Width of the input images
+img_channels = 3  # Number of color channels of the input images
+n_classes = len(ids)  # Number of classes including the background class
+min_scale = 0.08  # The scaling factor for the smallest anchor boxes
+max_scale = 0.96  # The scaling factor for the largest anchor boxes
+scales = [0.08, 0.16, 0.32, 0.64, 0.96] # An explicit list of anchor box scaling factors. If this is passed, it will override `min_scale` and `max_scale`.
+aspect_ratios = [0.5, 1.0, 2.0]   # The list of aspect ratios for the anchor boxes
+two_boxes_for_ar1 = True    # Whether or not you want to generate two anchor boxes for aspect ratio 1
+limit_boxes = False   # Whether or not you want to limit the anchor boxes to lie entirely within the image boundaries
+variances = [1.0, 1.0, 1.0, 1.0]  # The list of variances by which the encoded target coordinates are scaled
+coords = 'centroids'  # Whether the box coordinates to be used should be in the 'centroids' or 'minmax' format, see documentation
+normalize_coords = False  # Whether or not the model is supposed to use relative coordinates that are within [0,1]
 
 K.clear_session()
-model, predictor_sizes = build_model(image_size=(img_height, img_width, img_channels),
+model = build_model(image_size=(img_height, img_width, img_channels),
                                      n_classes=n_classes,
                                      min_scale=min_scale,
                                      max_scale=max_scale,
@@ -106,6 +107,7 @@ model, predictor_sizes = build_model(image_size=(img_height, img_width, img_chan
                                      variances=variances,
                                      coords=coords,
                                      normalize_coords=normalize_coords)
+
 adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=5e-04)
 ssd_loss = SSDLoss(neg_pos_ratio=3, n_neg_min=0, alpha=1.0)
 model.compile(optimizer=adam, loss=ssd_loss.compute_loss)
@@ -113,17 +115,17 @@ model.compile(optimizer=adam, loss=ssd_loss.compute_loss)
 train_dataset = BatchGenerator(box_output_format=['class_id', 'xmin', 'xmax', 'ymin', 'ymax'])
 val_dataset = BatchGenerator(box_output_format=['class_id', 'xmin', 'xmax', 'ymin', 'ymax'])
 
-train_images_path = '.data/train'
+train_images_path = './data/train/'
 train_labels_path = './train_labels.csv'
-val_images_path = '.data/train'
+val_images_path = './data/train/'
 val_labels_path = './val_labels.csv'
-train_dataset.parse_csv(images_path=train_images_path,
-                        labels_path=train_labels_path,
+train_dataset.parse_csv(images_dir=train_images_path,
+                        labels_filename=train_labels_path,
                         input_format=['image_name', 'xmin', 'xmax', 'ymin', 'ymax', 'class_id'],
                         include_classes='all')
 
-val_dataset.parse_csv(images_path=train_images_path,
-                      labels_path=train_labels_path,
+val_dataset.parse_csv(images_dir=val_images_path,
+                      labels_filename=val_labels_path,
                       input_format=['image_name', 'xmin', 'xmax', 'ymin', 'ymax', 'class_id'],
                       include_classes='all')
 

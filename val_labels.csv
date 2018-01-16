@@ -1,4 +1,4 @@
-frame,xmin,xmax,ymin,ymaxs,class_id
+frame,xmin,xmax,ymin,ymax,class_id
 AGV7939_20160808_073637.jpg,125,231,54,93,1
 X59329_20131003_130326.jpg,83,157,17,43,2
 ADB2531_20161117_061530.jpg,77,168,6,36,3
